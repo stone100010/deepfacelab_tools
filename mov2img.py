@@ -9,6 +9,13 @@ from tools_main import *
 from multiprocessing import Process
 from multiprocessing import Pool
 
+def sys_argv_var():
+	parser = argparse.ArgumentParser(description="you should add those parameter")
+	parser.add_argument("--filepath", default=None, help="--filepath videos/")
+	parser.add_argument("--imgcutnum", default=3, help="--imgcutnum 3")
+	parser.add_argument("--filetype", default="mp4", help="--filetype mp4")
+	args = parser.parse_args()
+	return args
 
 def GetNameByEveryDir(file_dir, videoProperty):
     """[summary]
@@ -66,6 +73,7 @@ def video_to_omg(file_name, file_name_with_path, img_save_dir, count):
 
 
 if __name__ == '__main__':
+    args = sys_argv_var()
     time_time = time.time()
     root_dir = 'video_list/'
     save_dir = 'data_src/'
