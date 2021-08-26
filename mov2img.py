@@ -5,15 +5,18 @@
 
 
 import cv2, os, time
+import argparse
 from tools_main import *
 from multiprocessing import Process
 from multiprocessing import Pool
 
+
 def sys_argv_var():
 	parser = argparse.ArgumentParser(description="you should add those parameter")
-	parser.add_argument("--filepath", default=None, help="--filepath videos/")
-	parser.add_argument("--imgcutnum", default=3, help="--imgcutnum 3")
+	parser.add_argument("--inputpath", default=None, help="--filepath videos")
+	parser.add_argument("--savepath", default=None, help="--savepath data_src")
 	parser.add_argument("--filetype", default="mp4", help="--filetype mp4")
+	parser.add_argument("--imgcutnum", type=int, default=3, help="--imgcutnum 3")
 	args = parser.parse_args()
 	return args
 
@@ -52,7 +55,7 @@ def video_to_omg(file_name, file_name_with_path, img_save_dir, count):
     videoLeftUp = cv2.VideoCapture(file_name_with_path)
     fps = videoLeftUp.get(cv2.CAP_PROP_FPS)
     # count = int(fps / count)  # 帧率，用于跳帧处理
-    count = 3
+    # count = 3
     count_img = 0
     while (videoLeftUp.isOpened()):
         retLeftUp, frameLeftUp = videoLeftUp.read()
@@ -73,11 +76,14 @@ def video_to_omg(file_name, file_name_with_path, img_save_dir, count):
 
 
 if __name__ == '__main__':
-    args = sys_argv_var()
+    args_file_val = sys_argv_var()
+    print(args_file_val)
     time_time = time.time()
-    root_dir = 'video_list/'
-    save_dir = 'data_src/'
-    FileName, FileNameWithPath, FileDir = GetNameByEveryDir(root_dir, '.mp4')
+    root_dir = args_file_val.inputpath + "/"
+    save_dir = args_file_val.savepath + "/"
+    file_type = "." + args_file_val.filetype
+    cut_num = int(args_file_val.imgcutnum)
+    FileName, FileNameWithPath, FileDir = GetNameByEveryDir(root_dir, file_type)
     # 设置进程池 最多10个进程
     p = Pool(6)
     # print(len(FileNameWithPath))
@@ -94,7 +100,7 @@ if __name__ == '__main__':
             # p.start()
             # 限制进程数
             # p.apply_async(video_to_omg, args=(FileName[j], FileNameWithPath[j], img_save_dir, 3))
-            p.apply_async(video_to_omg, args=(FileName[j], FileNameWithPath[j], save_dir, 3))
+            p.apply_async(video_to_omg, args=(FileName[j], FileNameWithPath[j], save_dir, cut_num))
         except Exception as e:
             print(e)
     p.close()
